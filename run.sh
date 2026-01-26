@@ -1,5 +1,3 @@
-export PYTHONPATH="$PWD:$PYTHONPATH"
-
 gpu_n=$1
 DATASET=$2
 
