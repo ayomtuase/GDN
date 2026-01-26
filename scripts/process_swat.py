@@ -49,6 +49,9 @@ def main():
     test = pd.read_csv(f"{base_path}/swat_test.csv", index_col=0)
     train = pd.read_csv(f"{base_path}/swat_train.csv", index_col=0)
 
+    train["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
+    test["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
+
     test = test.iloc[:, 1:]
     train = train.iloc[:, 1:]
 
@@ -63,9 +66,6 @@ def main():
 
     print("Test Columns",len(test.columns),test.columns)
     print("Training Columns", len(train.columns),train.columns)
-
-    train["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
-    test["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
 
     train_labels = train.attack
     test_labels = test.attack
