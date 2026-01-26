@@ -49,8 +49,8 @@ def main():
     test = pd.read_csv(f"{base_path}/swat_test.csv", index_col=0)
     train = pd.read_csv(f"{base_path}/swat_train.csv", index_col=0)
 
-    train["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
-    test["attack"] = df.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
+    train["attack"] = train.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
+    test["attack"] = test.pop("Normal/Attack").map({"Attack": 1, "Normal": 0})
 
     test = test.iloc[:, 1:]
     train = train.iloc[:, 1:]
