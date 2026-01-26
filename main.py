@@ -40,17 +40,18 @@ class Main():
         self.env_config = env_config
         self.datestr = None
 
-        dataset = self.env_config['dataset'] 
-        train_orig = pd.read_csv(f'./data/{dataset}/train.csv', sep=',', index_col=0)
-        test_orig = pd.read_csv(f'./data/{dataset}/test.csv', sep=',', index_col=0)
-       
+        dataset = self.env_config['dataset']
+        save_base_path = self.env_config['save_base_path']
+        train_orig = pd.read_csv(f'{save_base_path}/data/{dataset}/train.csv', sep=',', index_col=0)
+        test_orig = pd.read_csv(f'{save_base_path}/data/{dataset}/test.csv', sep=',', index_col=0)
+
         train, test = train_orig, test_orig
 
         if 'attack' in train.columns:
             train = train.drop(columns=['attack'])
 
-        feature_map = get_feature_map(dataset)
-        fc_struc = get_fc_graph_struc(dataset)
+        feature_map = get_feature_map(dataset, save_base_path)
+        fc_struc = get_fc_graph_struc(dataset, save_base_path)
 
         set_device(env_config['device'])
         self.device = get_device()
@@ -88,15 +89,13 @@ class Main():
         edge_index_sets = []
         edge_index_sets.append(fc_edge_index)
 
-        self.model = GDN(edge_index_sets, len(feature_map), 
-                dim=train_config['dim'], 
+        self.model = GDN(edge_index_sets, len(feature_map),
+                dim=train_config['dim'],
                 input_dim=train_config['slide_win'],
                 out_layer_num=train_config['out_layer_num'],
                 out_layer_inter_dim=train_config['out_layer_inter_dim'],
                 topk=train_config['topk']
             ).to(self.device)
-
-
 
     def run(self):
 
@@ -105,18 +104,18 @@ class Main():
         else:
             model_save_path = self.get_save_path()[0]
 
-            self.train_log = train(self.model, model_save_path, 
+            self.train_log = train(self.model, model_save_path,
                 config = train_config,
                 train_dataloader=self.train_dataloader,
-                val_dataloader=self.val_dataloader, 
+                val_dataloader=self.val_dataloader,
                 feature_map=self.feature_map,
                 test_dataloader=self.test_dataloader,
                 test_dataset=self.test_dataset,
                 train_dataset=self.train_dataset,
                 dataset_name=self.env_config['dataset']
             )
-        
-        # test            
+
+        # test
         self.model.load_state_dict(torch.load(model_save_path))
         best_model = self.model.to(self.device)
 
@@ -154,10 +153,10 @@ class Main():
         np_val_result = np.array(val_result)
 
         test_labels = np_test_result[2, :, 0].tolist()
-    
+
         test_scores, normal_scores = get_full_err_scores(test_result, val_result)
 
-        top1_best_info = get_best_performance_data(test_scores, test_labels, topk=1) 
+        top1_best_info = get_best_performance_data(test_scores, test_labels, topk=1)
         top1_val_info = get_val_performance_data(test_scores, normal_scores, test_labels, topk=1)
 
 
@@ -177,15 +176,15 @@ class Main():
     def get_save_path(self, feature_name=''):
 
         dir_path = self.env_config['save_path']
-        
+
         if self.datestr is None:
             now = datetime.now()
             self.datestr = now.strftime('%m|%d-%H:%M:%S')
-        datestr = self.datestr          
+        datestr = self.datestr
 
         paths = [
-            f'./pretrained/{dir_path}/best_{datestr}.pt',
-            f'./results/{dir_path}/{datestr}.csv',
+            f'/content/drive/My Drive/MTech Research/GDN/pretrained/{dir_path}/best_{datestr}.pt',
+            f'/content/drive/My Drive/MTech Research/GDN/results/{dir_path}/{datestr}.csv',
         ]
 
         for path in paths:
@@ -215,6 +214,7 @@ if __name__ == "__main__":
     parser.add_argument('-topk', help='topk num', type = int, default=20)
     parser.add_argument('-report', help='best / val', type = str, default='best')
     parser.add_argument('-load_model_path', help='trained model path', type = str, default='')
+    parser.add_argument('-save_base_path', help='save base path', type = str, default='')
 
     args = parser.parse_args()
 
@@ -248,9 +248,10 @@ if __name__ == "__main__":
         'dataset': args.dataset,
         'report': args.report,
         'device': args.device,
-        'load_model_path': args.load_model_path
+        'load_model_path': args.load_model_path,
+        'save_base_path': args.save_base_path
     }
-    
+
 
     main = Main(train_config, env_config, debug=False)
     main.run()

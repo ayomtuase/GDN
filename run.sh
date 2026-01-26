@@ -11,6 +11,7 @@ topk=5
 out_layer_inter_dim=128
 val_ratio=0.2
 decay=0
+save_base_path='/content/drive/My Drive/MTech Research/GDN'
 
 
 path_pattern="${DATASET}"
@@ -37,7 +38,8 @@ if [[ "$gpu_n" == "cpu" ]]; then
         -val_ratio $val_ratio \
         -report $report \
         -topk $topk \
-        -device 'cpu'
+        -device 'cpu' \
+        -save_base_path $save_base_path
 else
     CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
         -dataset $DATASET \
@@ -55,5 +57,6 @@ else
         -decay $decay \
         -val_ratio $val_ratio \
         -report $report \
-        -topk $topk
+        -topk $topk \
+        -save_base_path $save_base_path
 fi

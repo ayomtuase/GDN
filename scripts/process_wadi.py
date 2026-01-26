@@ -41,10 +41,14 @@ def downsample(data, labels, down_len):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base-path")
+    args = parser.parse_args()
+    base_path = args.base_path if args.base_path is not None else '.'
 
-    train = pd.read_csv('./WADI_14days.csv', index_col=0)
-    test = pd.read_csv('./WADI_attackdata_labelled.csv', index_col=0)
-    
+    train = pd.read_csv(f'{base_path}/WADI_14days.csv', index_col=0)
+    test = pd.read_csv(f'{base_path}/WADI_attackdata_labelled.csv', index_col=0)
+
 
     train = train.iloc[:, 2:]
     test = test.iloc[:, 3:]
@@ -92,10 +96,10 @@ def main():
 
     train_df = train_df.iloc[2160:]
 
-    train_df.to_csv('./train.csv')
-    test_df.to_csv('./test.csv')
+    train_df.to_csv(f'{base_path}/train.csv')
+    test_df.to_csv(f'{base_path}/test.csv')
 
-    f = open('./list.txt', 'w')
+    f = open(f'{base_path}/list.txt', 'w')
     for col in train.columns:
         f.write(col+'\n')
     f.close()
