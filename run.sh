@@ -39,7 +39,7 @@ if [[ "$gpu_n" == "cpu" ]]; then
         -report $report \
         -topk $topk \
         -device 'cpu' \
-        -save_base_path $save_base_path
+        -save_base_path "$save_base_path"
 else
     CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
         -dataset $DATASET \
