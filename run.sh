@@ -1,5 +1,3 @@
-#!/bin/bash
-
 gpu_n=$1
 DATASET=$2
 
@@ -15,7 +13,6 @@ val_ratio=0.2
 decay=0
 SAVE_BASE_PATH="/content/drive/My Drive/MTech Research/GDN"
 
-
 path_pattern="${DATASET}"
 COMMENT="${DATASET}"
 
@@ -23,7 +20,6 @@ EPOCH=30
 report='best'
 
 if [[ "$gpu_n" == "cpu" ]]; then
-    echo ">>> $save_base_path"
     python main.py \
         -dataset $DATASET \
         -save_path_pattern $path_pattern \
@@ -61,5 +57,5 @@ else
         -val_ratio $val_ratio \
         -report $report \
         -topk $topk \
-        -save_base_path $save_base_path
+        -save_base_path "${SAVE_BASE_PATH}"
 fi
