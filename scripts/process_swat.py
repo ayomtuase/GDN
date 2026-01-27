@@ -93,10 +93,10 @@ def main():
     print("Training Data Shape",train_df.values.shape)
     print("Test Data Shape", test_df.values.shape)
 
-    train_df.to_csv(f"{base_path}/train.csv")
-    test_df.to_csv(f"{base_path}/test.csv")
+    train_df.to_csv(f"{base_path}/data/swat/train.csv")
+    test_df.to_csv(f"{base_path}/data/swat/test.csv")
 
-    f = open(f"{base_path}/list.txt", "w")
+    f = open(f"{base_path}/data/swat/list.txt", "w")
     for col in train.columns:
         f.write(col + "\n")
     f.close()
