@@ -42,7 +42,7 @@ class GraphLayer(MessagePassing):
         glorot(self.lin.weight)
         glorot(self.att_i)
         glorot(self.att_j)
-        
+
         zeros(self.att_em_i)
         zeros(self.att_em_j)
 
@@ -107,13 +107,13 @@ class GraphLayer(MessagePassing):
 
 
         alpha = F.leaky_relu(alpha, self.negative_slope)
-        alpha = softmax(alpha, edge_index_i, size_i)
+        alpha = softmax(alpha, edge_index_i, num_nodes=size_i)
 
         if return_attention_weights:
             self.__alpha__ = alpha
 
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
-        
+
         return x_j * alpha.view(-1, self.heads, 1)
 
 
