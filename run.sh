@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 gpu_n=$1
 DATASET=$2
 
@@ -21,6 +23,7 @@ EPOCH=30
 report='best'
 
 if [[ "$gpu_n" == "cpu" ]]; then
+    echo ">>> $save_base_path"
     python main.py \
         -dataset $DATASET \
         -save_path_pattern $path_pattern \
