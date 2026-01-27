@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 gpu_n=$1
 DATASET=$2
 
@@ -13,7 +11,7 @@ topk=5
 out_layer_inter_dim=128
 val_ratio=0.2
 decay=0
-save_base_path='/content/drive/My Drive/MTech Research/GDN'
+SAVE_BASE_PATH="/content/drive/My Drive/MTech Research/GDN"
 
 
 path_pattern="${DATASET}"
@@ -42,7 +40,7 @@ if [[ "$gpu_n" == "cpu" ]]; then
         -report $report \
         -topk $topk \
         -device 'cpu' \
-        -save_base_path "$save_base_path"
+        -save_base_path "${SAVE_BASE_PATH}"
 else
     CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
         -dataset $DATASET \
