@@ -65,8 +65,8 @@ class GraphLayer(MessagePassing):
         print("x[0] shape", x[0].shape)
         print("x[1] shape", x[1].shape)
 
-        print('edge_index', edge_index)
-        print('embedding', embedding)
+        print('edge_index', edge_index.shape)
+        print('embedding', embedding.shape)
 
         out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index,
                              return_attention_weights=return_attention_weights)
