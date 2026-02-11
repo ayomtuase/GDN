@@ -62,6 +62,14 @@ class GraphLayer(MessagePassing):
         edge_index, _ = add_self_loops(edge_index,
                                        num_nodes=x[1].size(self.node_dim))
 
+        print("x shape", x)
+        print("x[0] shape", x[0])
+        print("x[1] shape", x[1])
+
+        print('edge_index', edge_index)
+        print('embedding', embedding)
+        print('return_attention_weights', return_attention_weights)
+
         out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index,
                              return_attention_weights=return_attention_weights)
 
