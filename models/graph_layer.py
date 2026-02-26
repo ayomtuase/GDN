@@ -90,6 +90,8 @@ class GraphLayer(MessagePassing):
                 edges,
                 return_attention_weights):
 
+        edges = edges.permute(1, 0)
+
         x_i = x_i.view(-1, self.heads, self.out_channels)
         x_j = x_j.view(-1, self.heads, self.out_channels)
 
