@@ -68,7 +68,7 @@ class GraphLayer(MessagePassing):
         print('edge_index', edge_index.shape)
         print('embedding', embedding.shape)
 
-        out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index.permute(1, 0, 2),
+        out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index.permute(1, 0),
                              return_attention_weights=return_attention_weights)
 
         if self.concat:
