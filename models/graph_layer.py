@@ -90,8 +90,6 @@ class GraphLayer(MessagePassing):
                 edges,
                 return_attention_weights):
 
-        edges = edges.permute(1, 0)
-
         x_i = x_i.view(-1, self.heads, self.out_channels)
         x_j = x_j.view(-1, self.heads, self.out_channels)
 
@@ -103,16 +101,12 @@ class GraphLayer(MessagePassing):
             key_i = torch.cat((x_i, embedding_i), dim=-1)
             key_j = torch.cat((x_j, embedding_j), dim=-1)
 
-
-
         cat_att_i = torch.cat((self.att_i, self.att_em_i), dim=-1)
         cat_att_j = torch.cat((self.att_j, self.att_em_j), dim=-1)
 
         alpha = (key_i * cat_att_i).sum(-1) + (key_j * cat_att_j).sum(-1)
 
-
         alpha = alpha.view(-1, self.heads, 1)
-
 
         alpha = F.leaky_relu(alpha, self.negative_slope)
         alpha = softmax(alpha, edge_index_i, num_nodes=size_i)
@@ -124,9 +118,7 @@ class GraphLayer(MessagePassing):
 
         return x_j * alpha.view(-1, self.heads, 1)
 
-
-
     def __repr__(self):
-        return '{}({}, {}, heads={})'.format(self.__class__.__name__,
-                                             self.in_channels,
-                                             self.out_channels, self.heads)
+        return "{}({}, {}, heads={})".format(
+            self.__class__.__name__, self.in_channels, self.out_channels, self.heads
+        )
