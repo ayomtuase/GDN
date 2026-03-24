@@ -177,7 +177,7 @@ class GDN(nn.Module):
 
             gated_i = (
                 torch.arange(0, node_num)
-                .mT.unsqueeze(1)
+                .unsqueeze(1)
                 .repeat(1, topk_num)
                 .flatten()
                 .to(device)
