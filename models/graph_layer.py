@@ -1,17 +1,28 @@
-import torch
-from torch.nn import Parameter, Linear, Sequential, BatchNorm1d, ReLU
-import torch.nn.functional as F
-from torch_geometric.nn.conv import MessagePassing
-from torch_geometric.utils import remove_self_loops, add_self_loops, softmax
-
-from torch_geometric.nn.inits import glorot, zeros
-import time
 import math
+import time
+
+import torch
+import torch.nn.functional as F
+from torch.nn import BatchNorm1d, Linear, Parameter, ReLU, Sequential
+from torch_geometric.nn.conv import MessagePassing
+from torch_geometric.nn.inits import glorot, zeros
+from torch_geometric.utils import add_self_loops, remove_self_loops, softmax
+
 
 class GraphLayer(MessagePassing):
-    def __init__(self, in_channels, out_channels, heads=1, concat=True,
-                 negative_slope=0.2, dropout=0, bias=True, inter_dim=-1,**kwargs):
-        super(GraphLayer, self).__init__(aggr='add', **kwargs)
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        heads=1,
+        concat=True,
+        negative_slope=0.2,
+        dropout=0,
+        bias=True,
+        inter_dim=-1,
+        **kwargs
+    ):
+        super(GraphLayer, self).__init__(aggr="add", **kwargs)
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -34,7 +45,7 @@ class GraphLayer(MessagePassing):
         elif bias and not concat:
             self.bias = Parameter(torch.Tensor(out_channels))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter("bias", None)
 
         self.reset_parameters()
 
@@ -48,8 +59,6 @@ class GraphLayer(MessagePassing):
 
         zeros(self.bias)
 
-
-
     def forward(self, x, edge_index, embedding, return_attention_weights=False):
         """"""
         if torch.is_tensor(x):
@@ -59,17 +68,15 @@ class GraphLayer(MessagePassing):
             x = (self.lin(x[0]), self.lin(x[1]))
 
         edge_index, _ = remove_self_loops(edge_index)
-        edge_index, _ = add_self_loops(edge_index,
-                                       num_nodes=x[1].size(self.node_dim))
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x[1].size(self.node_dim))
 
-        print("x[0] shape", x[0].shape)
-        print("x[1] shape", x[1].shape)
-
-        print('edge_index', edge_index.shape)
-        print('embedding', embedding.shape)
-
-        out = self.propagate(edge_index, x=x, embedding=embedding, edges=edge_index.permute(1, 0),
-                             return_attention_weights=return_attention_weights)
+        out = self.propagate(
+            edge_index,
+            x=x,
+            embedding=embedding,
+            edges=edge_index.permute(1, 0),
+            return_attention_weights=return_attention_weights,
+        )
 
         if self.concat:
             out = out.view(-1, self.heads * self.out_channels)
@@ -85,18 +92,20 @@ class GraphLayer(MessagePassing):
         else:
             return out
 
-    def message(self, x_i, x_j, edge_index_i, size_i,
-                embedding,
-                edges,
-                return_attention_weights):
+    def message(
+        self, x_i, x_j, edge_index_i, size_i, embedding, edges, return_attention_weights
+    ):
 
         x_i = x_i.view(-1, self.heads, self.out_channels)
         x_j = x_j.view(-1, self.heads, self.out_channels)
 
         if embedding is not None:
             embedding_i, embedding_j = embedding[edge_index_i], embedding[edges[0]]
-            embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
-            embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
+            # Ensure embeddings have correct dimensions for broadcasting
+            if embedding_i.dim() == 2:
+                embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
+            if embedding_j.dim() == 2:
+                embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
 
             key_i = torch.cat((x_i, embedding_i), dim=-1)
             key_j = torch.cat((x_j, embedding_j), dim=-1)
