@@ -113,8 +113,6 @@ class GDN(nn.Module):
             ]
         )
 
-        print("self.gnn_layers shape", self.gnn_layers.shape)
-
         self.node_embedding = None
         self.topk = topk
         self.learned_graph = None
