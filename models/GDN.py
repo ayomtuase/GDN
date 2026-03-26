@@ -113,7 +113,7 @@ class GDN(nn.Module):
             ]
         )
 
-        print("self.gnn_layers shape", self.gnn_layers)
+        print("self.gnn_layers shape", self.gnn_layers.shape)
 
         self.node_embedding = None
         self.topk = topk
@@ -124,7 +124,7 @@ class GDN(nn.Module):
         )
 
         self.cache_edge_index_sets = [None] * edge_set_num
-        print("cache_edge_index_sets shape", cache_edge_index_sets.shape)
+        print("cache_edge_index_sets shape", self.cache_edge_index_sets.shape)
         self.cache_embed_index = None
 
         self.dp = nn.Dropout(0.2)
