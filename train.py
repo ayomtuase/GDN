@@ -31,7 +31,7 @@ def train(model = None, save_path = '', config={},  train_dataloader=None, val_d
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=config['decay'])
 
     now = time.time()
-    
+
     train_loss_list = []
     cmp_loss_list = []
 
@@ -65,23 +65,27 @@ def train(model = None, save_path = '', config={},  train_dataloader=None, val_d
 
             x, labels, edge_index = [item.float().to(device) for item in [x, labels, edge_index]]
 
+            print("x shape in train fn", x.shape)
+            print("labels shape in train fn", labels.shape)
+            print("edge_index shape in train fn", edge_index.shape)
+
             optimizer.zero_grad()
             out = model(x, edge_index).float().to(device)
             loss = loss_func(out, labels)
-            
+
             loss.backward()
             optimizer.step()
 
-            
+
             train_loss_list.append(loss.item())
             acu_loss += loss.item()
-                
+
             i += 1
 
 
         # each epoch
         print('epoch ({} / {}) (Loss:{:.8f}, ACU_loss:{:.8f})'.format(
-                        i_epoch, epoch, 
+                        i_epoch, epoch,
                         acu_loss/len(dataloader), acu_loss), flush=True
             )
 

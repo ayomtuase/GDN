@@ -95,9 +95,12 @@ class GraphLayer(MessagePassing):
     def message(
         self, x_i, x_j, edge_index_i, size_i, embedding, edges, return_attention_weights
     ):
-
+        print("x_i shape before view in message", x_i.shape)
+        print("x_j shape before view in message", x_j.shape)
         x_i = x_i.view(-1, self.heads, self.out_channels)
         x_j = x_j.view(-1, self.heads, self.out_channels)
+        print("x_i shape after view in message", x_i.shape)
+        print("x_j shape after view in message", x_j.shape)
 
         if embedding is not None:
             embedding_i, embedding_j = embedding[edge_index_i], embedding[edges[0]]
@@ -106,6 +109,9 @@ class GraphLayer(MessagePassing):
                 embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
             if embedding_j.dim() == 2:
                 embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
+
+            print("embedding_i shape", embedding_i.shape)
+            print("embedding_j shape", embedding_j.shape)
 
             key_i = torch.cat((x_i, embedding_i), dim=-1)
             key_j = torch.cat((x_j, embedding_j), dim=-1)

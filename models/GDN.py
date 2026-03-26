@@ -105,12 +105,15 @@ class GDN(nn.Module):
         self.bn_outlayer_in = nn.BatchNorm1d(embed_dim)
 
         edge_set_num = len(edge_index_sets)
+        print("edge_set_num", edge_set_num)
         self.gnn_layers = nn.ModuleList(
             [
                 GNNLayer(input_dim, dim, inter_dim=dim + embed_dim, heads=1)
                 for i in range(edge_set_num)
             ]
         )
+
+        print("self.gnn_layers shape", self.gnn_layers)
 
         self.node_embedding = None
         self.topk = topk
@@ -121,6 +124,7 @@ class GDN(nn.Module):
         )
 
         self.cache_edge_index_sets = [None] * edge_set_num
+        print("cache_edge_index_sets shape", cache_edge_index_sets.shape)
         self.cache_embed_index = None
 
         self.dp = nn.Dropout(0.2)
@@ -138,7 +142,9 @@ class GDN(nn.Module):
         device = data.device
 
         batch_num, node_num, all_feature = x.shape
+        print("x shape before viewing", x.shape)
         x = x.view(-1, all_feature).contiguous()
+        print("x shape after viewing", x.shape)
 
         gcn_outs = []
         for i, edge_index in enumerate(edge_index_sets):
@@ -185,10 +191,14 @@ class GDN(nn.Module):
             )
             gated_j = topk_indices_ji.flatten().unsqueeze(0)
             gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
+            print("gated_i shape", gated_i.shape)
+            print("gated_j shape", gated_j.shape)
+            print("gated_edge_index shape", gated_edge_index.shape)
 
             batch_gated_edge_index = get_batch_edge_index(
                 gated_edge_index, batch_num, node_num
             ).to(device)
+            print("batch_gated_edge_index shape", batch_gated_edge_index.shape)
             gcn_out = self.gnn_layers[i](
                 x,
                 batch_gated_edge_index,
