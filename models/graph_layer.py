@@ -102,6 +102,9 @@ class GraphLayer(MessagePassing):
         print("x_i shape after view in message", x_i.shape)
         print("x_j shape after view in message", x_j.shape)
 
+        print("embedding in Graph Layer", embedding.shape)
+        print("edges", edges)
+
         if embedding is not None:
             embedding_i, embedding_j = embedding[edge_index_i], embedding[edges[0]]
             # Ensure embeddings have correct dimensions for broadcasting

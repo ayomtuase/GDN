@@ -158,11 +158,16 @@ class GDN(nn.Module):
                 ).to(device)
 
             batch_edge_index = self.cache_edge_index_sets[i]
+            print("self.embedding of GDN", self.embedding)
+            print("weight shape of GDN", self.embedding.weight.shape)
+
 
             all_embeddings = self.embedding(torch.arange(node_num).to(device))
 
             weights_arr = all_embeddings.detach().clone()
             all_embeddings = all_embeddings.repeat(batch_num, 1)
+
+            print("all_embeddings", all_embeddings.shape)
 
             weights = weights_arr.view(node_num, -1)
 
