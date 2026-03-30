@@ -111,7 +111,7 @@ class GraphLayer(MessagePassing):
         if embedding is not None:
             embedding_i, embedding_j = (
                 embedding[edge_index_i],
-                embedding[edges.clone().detach().t().contiguous()[0]],
+                embedding[edges[0]],
             )
             # embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
             # embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
