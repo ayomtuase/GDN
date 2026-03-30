@@ -68,13 +68,15 @@ class GraphLayer(MessagePassing):
             x = (self.lin(x[0]), self.lin(x[1]))
 
         edge_index, _ = remove_self_loops(edge_index)
+        print("edge_index after remove_self_loops", edge_index.shape)
         edge_index, _ = add_self_loops(edge_index, num_nodes=x[1].size(self.node_dim))
+        print("edge_index after add_self_loops", edge_index.shape)
 
         out = self.propagate(
             edge_index,
             x=x,
             embedding=embedding,
-            edges=edge_index.permute(1, 0),
+            edges=edge_index,
             return_attention_weights=return_attention_weights,
         )
 
@@ -103,15 +105,18 @@ class GraphLayer(MessagePassing):
         print("x_j shape after view in message", x_j.shape)
 
         print("embedding in Graph Layer", embedding.shape)
+        print("edge_index_i", edge_index_i)
         print("edges", edges)
 
         if embedding is not None:
             embedding_i, embedding_j = embedding[edge_index_i], embedding[edges[0]]
+            embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
+            embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
             # Ensure embeddings have correct dimensions for broadcasting
-            if embedding_i.dim() == 2:
-                embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
-            if embedding_j.dim() == 2:
-                embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
+            # if embedding_i.dim() == 2:
+            #     embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
+            # if embedding_j.dim() == 2:
+            #     embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
 
             print("embedding_i shape", embedding_i.shape)
             print("embedding_j shape", embedding_j.shape)

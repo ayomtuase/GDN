@@ -192,6 +192,7 @@ class GDN(nn.Module):
                 .to(device)
                 .unsqueeze(0)
             )
+
             gated_j = topk_indices_ji.flatten().unsqueeze(0)
             gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
             print("gated_i shape", gated_i.shape)
@@ -201,7 +202,10 @@ class GDN(nn.Module):
             batch_gated_edge_index = get_batch_edge_index(
                 gated_edge_index, batch_num, node_num
             ).to(device)
+
             print("batch_gated_edge_index shape", batch_gated_edge_index.shape)
+            print("batch_gated_edge_index", batch_gated_edge_index)
+    
             gcn_out = self.gnn_layers[i](
                 x,
                 batch_gated_edge_index,
