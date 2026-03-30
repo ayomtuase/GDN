@@ -22,7 +22,7 @@ class GraphLayer(MessagePassing):
         inter_dim=-1,
         **kwargs
     ):
-        super(GraphLayer, self).__init__(aggr="add", **kwargs)
+        super(GraphLayer, self).__init__(aggr="add", node_dim=0, **kwargs)
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -113,13 +113,26 @@ class GraphLayer(MessagePassing):
                 embedding[edge_index_i],
                 embedding[edges[0]],
             )
-            # embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
-            # embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
             # Ensure embeddings have correct dimensions for broadcasting
+            # In PyG 2.7.0, embeddings need to match the message tensor shape exactly
             if embedding_i.dim() == 2:
                 embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
             if embedding_j.dim() == 2:
                 embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
+
+            # Ensure embedding dimensions match x_i and x_j exactly
+            # This prevents the scatter operation dimension mismatch
+            if embedding_i.shape[-1] != x_i.shape[-1]:
+                # Truncate or pad embedding to match x_i dimensions
+                target_dim = x_i.shape[-1]
+                if embedding_i.shape[-1] > target_dim:
+                    embedding_i = embedding_i[..., :target_dim]
+                    embedding_j = embedding_j[..., :target_dim]
+                else:
+                    # Pad with zeros if needed
+                    pad_size = target_dim - embedding_i.shape[-1]
+                    embedding_i = F.pad(embedding_i, (0, pad_size))
+                    embedding_j = F.pad(embedding_j, (0, pad_size))
 
             print("embedding_i shape", embedding_i.shape)
             print("embedding_i", embedding_i)
@@ -144,7 +157,10 @@ class GraphLayer(MessagePassing):
 
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
 
-        return x_j * alpha.view(-1, self.heads, 1)
+        # Return message with proper shape for PyG 2.7.0 aggregation
+        # The shape should be [num_edges, heads, out_channels]
+        message = x_j * alpha.view(-1, self.heads, 1)
+        return message.contiguous()
 
     def __repr__(self):
         return "{}({}, {}, heads={})".format(
