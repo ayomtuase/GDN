@@ -122,7 +122,9 @@ class GraphLayer(MessagePassing):
                 embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
 
             print("embedding_i shape", embedding_i.shape)
+            print("embedding_i", embedding_i)
             print("embedding_j shape", embedding_j.shape)
+            print("embedding_j", embedding_j)
 
             key_i = torch.cat((x_i, embedding_i), dim=-1)
             key_j = torch.cat((x_j, embedding_j), dim=-1)
