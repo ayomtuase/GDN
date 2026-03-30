@@ -68,9 +68,7 @@ class GraphLayer(MessagePassing):
             x = (self.lin(x[0]), self.lin(x[1]))
 
         edge_index, _ = remove_self_loops(edge_index)
-        print("edge_index after remove_self_loops", edge_index.shape)
         edge_index, _ = add_self_loops(edge_index, num_nodes=x[1].size(self.node_dim))
-        print("edge_index after add_self_loops", edge_index.shape)
 
         out = self.propagate(
             edge_index,
@@ -97,16 +95,8 @@ class GraphLayer(MessagePassing):
     def message(
         self, x_i, x_j, edge_index_i, size_i, embedding, edges, return_attention_weights
     ):
-        print("x_i shape before view in message", x_i.shape)
-        print("x_j shape before view in message", x_j.shape)
         x_i = x_i.view(-1, self.heads, self.out_channels)
         x_j = x_j.view(-1, self.heads, self.out_channels)
-        print("x_i shape after view in message", x_i.shape)
-        print("x_j shape after view in message", x_j.shape)
-
-        print("embedding in Graph Layer", embedding.shape)
-        print("edge_index_i", edge_index_i)
-        print("edges", edges)
 
         if embedding is not None:
             embedding_i, embedding_j = (
@@ -133,11 +123,6 @@ class GraphLayer(MessagePassing):
                     pad_size = target_dim - embedding_i.shape[-1]
                     embedding_i = F.pad(embedding_i, (0, pad_size))
                     embedding_j = F.pad(embedding_j, (0, pad_size))
-
-            print("embedding_i shape", embedding_i.shape)
-            print("embedding_i", embedding_i)
-            print("embedding_j shape", embedding_j.shape)
-            print("embedding_j", embedding_j)
 
             key_i = torch.cat((x_i, embedding_i), dim=-1)
             key_j = torch.cat((x_j, embedding_j), dim=-1)

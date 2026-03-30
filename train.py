@@ -1,20 +1,28 @@
+import time
+from test import *
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import matplotlib.pyplot as plt
 import torch.nn as nn
-import time
-from util.time import *
-from util.env import *
-from sklearn.metrics import mean_squared_error
-from test import *
 import torch.nn.functional as F
-import numpy as np
-from evaluate import get_best_performance_data, get_val_performance_data, get_full_err_scores
-from sklearn.metrics import precision_score, recall_score, roc_auc_score, f1_score
-from torch.utils.data import DataLoader, random_split, Subset
 from scipy.stats import iqr
+from sklearn.metrics import (
+    f1_score,
+    mean_squared_error,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from torch.utils.data import DataLoader, Subset, random_split
 
-
+from evaluate import (
+    get_best_performance_data,
+    get_full_err_scores,
+    get_val_performance_data,
+)
+from util.env import *
+from util.time import *
 
 
 def loss_func(y_pred, y_true):
@@ -64,10 +72,6 @@ def train(model = None, save_path = '', config={},  train_dataloader=None, val_d
             _start = time.time()
 
             x, labels, edge_index = [item.float().to(device) for item in [x, labels, edge_index]]
-
-            print("x shape in train fn", x.shape)
-            print("labels shape in train fn", labels.shape)
-            print("edge_index shape in train fn", edge_index.shape)
 
             optimizer.zero_grad()
             out = model(x, edge_index).float().to(device)

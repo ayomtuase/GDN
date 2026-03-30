@@ -89,7 +89,6 @@ class Main():
         edge_index_sets = []
         edge_index_sets.append(fc_edge_index)
 
-        print('Shape of edge index sets:', edge_index_sets[0].shape)
 
         self.model = GDN(edge_index_sets, len(feature_map),
                 dim=train_config['dim'],
