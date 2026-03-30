@@ -109,14 +109,17 @@ class GraphLayer(MessagePassing):
         print("edges", edges)
 
         if embedding is not None:
-            embedding_i, embedding_j = embedding[edge_index_i], embedding[edges[0]]
-            embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
-            embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
+            embedding_i, embedding_j = (
+                embedding[edge_index_i],
+                embedding[edges.clone().T().contiguous()[0]],
+            )
+            # embedding_i = embedding_i.unsqueeze(1).repeat(1,self.heads,1)
+            # embedding_j = embedding_j.unsqueeze(1).repeat(1,self.heads,1)
             # Ensure embeddings have correct dimensions for broadcasting
-            # if embedding_i.dim() == 2:
-            #     embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
-            # if embedding_j.dim() == 2:
-            #     embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
+            if embedding_i.dim() == 2:
+                embedding_i = embedding_i.unsqueeze(1).expand(-1, self.heads, -1)
+            if embedding_j.dim() == 2:
+                embedding_j = embedding_j.unsqueeze(1).expand(-1, self.heads, -1)
 
             print("embedding_i shape", embedding_i.shape)
             print("embedding_j shape", embedding_j.shape)
