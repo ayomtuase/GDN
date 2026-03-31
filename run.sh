@@ -17,7 +17,7 @@ path_pattern="${DATASET}"
 COMMENT="${DATASET}"
 
 EPOCH=30
-report='best'
+report='val'
 
 if [[ "$gpu_n" == "cpu" ]]; then
     python main.py \
@@ -38,7 +38,8 @@ if [[ "$gpu_n" == "cpu" ]]; then
         -report $report \
         -topk $topk \
         -device 'cpu' \
-        -save_base_path "$SAVE_BASE_PATH"
+        -save_base_path "$SAVE_BASE_PATH" \
+        -load_model_path "/content/drive/My Drive/MTech Research/GDN/pretrained/swat/best_03|30-23:05:53.pt"
 else
     echo ">>> $save_base_path"
     CUDA_VISIBLE_DEVICES=$gpu_n  python main.py \
@@ -58,5 +59,6 @@ else
         -val_ratio $val_ratio \
         -report $report \
         -topk $topk \
-        -save_base_path "$SAVE_BASE_PATH"
+        -save_base_path "$SAVE_BASE_PATH" \
+        -load_model_path "/content/drive/My Drive/MTech Research/GDN/pretrained/swat/best_03|30-23:05:53.pt"
 fi
